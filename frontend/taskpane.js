@@ -61,25 +61,15 @@ Office.onReady((info) => {
 
 // ── Initialize the App ───────────────────────────────────────
 async function init() {
-  // Check if user is already logged in (token saved from previous session)
-  const savedToken = localStorage.getItem("scp_token");
-  const savedEmail = localStorage.getItem("scp_email");
 
-  if (savedToken && savedEmail) {
-    // Try to validate the saved token with our backend
-    const valid = await verifyToken(savedToken);
-    if (valid) {
-      state.token = savedToken;
-      state.userEmail = savedEmail;
-      showScreen("screen-main");
-      await loadUserStatus();
-      return;
-    }
-  }
+  // TEMP: disable login system
+  state.token = "dev-mode";
+  state.userEmail = "demo@spellcheck.pro";
 
-  // No valid session — show login screen
-  showScreen("screen-login");
-  setupLoginHandlers();
+  showScreen("screen-main");
+
+  await loadUserStatus().catch(()=>{});
+
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -291,7 +281,7 @@ async function loadUserStatus() {
   document.getElementById("user-email-display").textContent = state.userEmail || "";
 
   try {
-    const res = await apiGet("/api/usage", state.token);
+    const res = await apiGet("/api/usage").catch(()=>({}));
     state.usageCount    = res.corrections_used  || 0;
     state.isSubscribed  = res.is_subscribed     || false;
     state.subExpiry     = res.sub_expiry        || null;
