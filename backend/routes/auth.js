@@ -34,9 +34,7 @@ const supabase = createClient(
 
 // Email transporter (for sending OTP emails)
 const emailTransporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || "587"),
-  secure: false, // Use STARTTLS
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
