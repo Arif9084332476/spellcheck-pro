@@ -1,0 +1,865 @@
+/*
+  ============================================================
+  STYLES.CSS — Visual Design for SpellCheck Pro Task Pane
+  ============================================================
+  This file controls how the add-in looks inside Excel.
+  Design philosophy: Clean, minimal, professional — like
+  a premium Microsoft 365 app but with personality.
+
+  Color System:
+    --ink       Deep navy text
+    --surface   Clean white background
+    --accent    Vibrant teal/green for actions
+    --muted     Soft gray for secondary text
+    --danger    Red for errors
+    --border    Light gray lines
+  ============================================================
+*/
+
+/* ── Reset & Base ──────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --ink: #0d1117;
+  --ink-soft: #3d4a5c;
+  --surface: #ffffff;
+  --surface-2: #f4f6f9;
+  --surface-3: #eaecf0;
+  --accent: #1a6b55;
+  --accent-hover: #155847;
+  --accent-light: #e8f4f0;
+  --accent-text: #0e4a39;
+  --upgrade: #c44d1a;
+  --upgrade-hover: #a33e13;
+  --upgrade-light: #fff0ea;
+  --danger: #c0392b;
+  --danger-light: #fdf0ee;
+  --success: #1a6b55;
+  --success-light: #e8f4f0;
+  --muted: #6b7280;
+  --border: #e2e5e9;
+  --border-focus: #1a6b55;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+  --transition: 0.18s ease;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Screen Management ─────────────────────────────────────── */
+/* Each "screen" is a full panel. Only one is shown at a time. */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.screen.active { display: block; }
+.screen.hidden  { display: none; }
+.hidden         { display: none !important; }
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 1: LOGIN
+══════════════════════════════════════════════════════════ */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  background: linear-gradient(160deg, #f0f7f4 0%, #e8f4f0 40%, #f4f6f9 100%);
+}
+
+/* Brand section at top of login */
+.brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.brand-icon {
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+
+.brand-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+}
+
+.brand-accent {
+  color: var(--accent);
+}
+
+.brand-tagline {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+/* Login card */
+.login-card {
+  width: 100%;
+  max-width: 300px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.login-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+}
+
+.otp-sent-to {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+/* Text Input */
+.input-group {
+  margin-bottom: 14px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.text-input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(26, 107, 85, 0.12);
+  background: var(--surface);
+}
+
+/* OTP input boxes (6 individual boxes) */
+.otp-inputs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.otp-digit {
+  width: 38px;
+  height: 44px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.otp-digit:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(26, 107, 85, 0.12);
+  background: var(--surface);
+}
+
+.login-hint {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════════════════
+   BUTTONS — used throughout the app
+══════════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26,107,85,0.3);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--ink-soft);
+}
+
+.btn-upgrade {
+  background: var(--upgrade);
+  color: white;
+}
+
+.btn-upgrade:hover:not(:disabled) {
+  background: var(--upgrade-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(196,77,26,0.3);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  font-size: 12px;
+}
+
+.btn-full { width: 100%; margin-top: 8px; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-xs { padding: 4px 10px; font-size: 11px; font-weight: 500; }
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 16px;
+  color: var(--muted);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+}
+
+.icon-btn:hover { color: var(--danger); background: var(--danger-light); }
+
+.btn-loading { font-weight: 400; opacity: 0.8; }
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 2: MAIN SPELL CHECK
+══════════════════════════════════════════════════════════ */
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--ink);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-logo { font-size: 16px; color: #4ecca3; }
+.header-title { font-weight: 700; font-size: 14px; letter-spacing: -0.3px; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Usage badge - shows "5/20 free" */
+.usage-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+  font-family: var(--font-mono);
+}
+
+.usage-badge.at-limit {
+  background: rgba(196, 77, 26, 0.3);
+  color: #ffb89a;
+}
+
+/* Subscription banners */
+.sub-banner {
+  background: var(--upgrade-light);
+  border-left: 3px solid var(--upgrade);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sub-banner-text strong { font-size: 13px; color: var(--upgrade); }
+.sub-banner-text p      { font-size: 11px; color: var(--ink-soft); }
+
+.pro-active-bar {
+  background: var(--success-light);
+  border-left: 3px solid var(--success);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-text);
+}
+
+/* Scan controls section */
+.scan-controls {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+/* Selection mode toggle buttons */
+.toggle-group {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font);
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all var(--transition);
+}
+
+.toggle-btn.active {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Main scan button */
+.btn-scan {
+  gap: 8px;
+  font-size: 14px;
+  padding: 11px 16px;
+  border-radius: var(--radius-md);
+}
+
+.scan-icon {
+  font-size: 16px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.btn-scan:hover .scan-icon,
+.btn-scan.scanning .scan-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Section divider */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  margin: 10px 0;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.section-divider span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Results Panel ─────────────────────────────────────────── */
+.results-panel {
+  padding: 4px 0 80px;
+  min-height: 200px;
+}
+
+/* Empty / idle state */
+.empty-state, .success-state, .scanning-state, .api-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-icon, .success-icon, .error-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.success-icon { color: var(--success); }
+.success-state p { color: var(--ink); font-weight: 600; }
+.success-state small { font-size: 12px; }
+
+/* Scanning dots animation */
+.scan-animation {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.scan-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: bounce-dot 1.2s ease-in-out infinite;
+}
+
+.scan-dot:nth-child(2) { animation-delay: 0.2s; }
+.scan-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40%           { transform: scale(1.2); opacity: 1; }
+}
+
+/* Errors found header */
+.errors-found { padding: 0 12px; }
+
+.errors-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#error-count-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Individual error card */
+.error-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  transition: all var(--transition);
+  animation: slide-in 0.25s ease;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.error-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(26,107,85,0.1);
+}
+
+.error-card.corrected {
+  opacity: 0.5;
+  border-color: var(--border);
+  text-decoration: line-through;
+}
+
+.error-card.ignored {
+  opacity: 0.35;
+}
+
+/* Cell reference label (e.g., "A2") */
+.error-cell-ref {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 7px;
+}
+
+/* Word → Suggestion row */
+.error-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.error-original {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--danger);
+  text-decoration: underline wavy var(--danger);
+  text-underline-offset: 3px;
+}
+
+.error-arrow {
+  color: var(--muted);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Dropdown showing suggestion options */
+.suggestion-select {
+  flex: 1;
+  min-width: 80px;
+  padding: 4px 8px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent-light);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius-sm);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Correct / Ignore buttons on each card */
+.error-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-correct {
+  background: var(--accent);
+  color: white;
+  border: none;
+}
+
+.btn-correct:hover { background: var(--accent-hover); }
+
+.btn-ignore {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+}
+
+.btn-ignore:hover { background: var(--surface-2); }
+
+/* Error message box */
+.error-box {
+  margin: 10px 0;
+  padding: 10px 12px;
+  background: var(--danger-light);
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--danger);
+  line-height: 1.5;
+}
+
+/* App footer */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  z-index: 90;
+}
+
+.app-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.app-footer a:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════════
+   SCREEN 3: UPGRADE
+══════════════════════════════════════════════════════════ */
+.upgrade-container {
+  padding: 16px 16px 40px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.back-btn:hover { color: var(--ink); }
+
+.upgrade-hero {
+  text-align: center;
+  padding: 20px 0 16px;
+}
+
+.upgrade-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+
+.upgrade-hero h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.upgrade-hero p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Pricing card */
+.pricing-card {
+  background: var(--surface);
+  border: 2px solid var(--upgrade);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-top: 4px;
+  box-shadow: var(--shadow-md);
+}
+
+.price-tag {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.price-currency {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--upgrade);
+  vertical-align: top;
+  margin-top: 8px;
+  display: inline-block;
+}
+
+.price-amount {
+  font-size: 52px;
+  font-weight: 800;
+  color: var(--upgrade);
+  line-height: 1;
+}
+
+.price-period {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.feature-list {
+  list-style: none;
+  margin-bottom: 18px;
+}
+
+.feature-list li {
+  font-size: 12px;
+  padding: 5px 0;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.feature-list li:last-child { border-bottom: none; }
+
+/* Duration selector */
+.duration-selector { margin-bottom: 16px; }
+.duration-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.duration-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.duration-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.duration-opt:has(input:checked) {
+  border-color: var(--upgrade);
+  background: var(--upgrade-light);
+  color: var(--upgrade);
+}
+
+.duration-opt input { accent-color: var(--upgrade); }
+
+.btn-pay { font-size: 15px; padding: 13px; border-radius: var(--radius-md); }
+
+.upi-note {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+/* Payment verification card */
+.verify-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.verify-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.verify-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+
+.verify-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }

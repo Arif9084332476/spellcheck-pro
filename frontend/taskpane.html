@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpellCheck Pro</title>
+
+  <!--
+    ============================================================
+    TASKPANE.HTML — The Visual Interface shown in Excel's Right Panel
+    ============================================================
+    This file is loaded inside Excel's task pane (right sidebar).
+    Think of it like a mini website running inside Excel.
+
+    Files loaded here:
+      - Office.js  → Microsoft's library to talk to Excel
+      - styles.css → Our custom look and feel
+      - taskpane.js → Our logic (button clicks, API calls, etc.)
+    ============================================================
+  -->
+
+  <!-- Google Fonts — Gives us beautiful typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Microsoft Office.js — REQUIRED to talk to Excel -->
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+
+  <!-- Our stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 1: LOGIN SCREEN
+       Shown when user has not logged in yet
+  ══════════════════════════════════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="login-container">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <h1 class="brand-name">SpellCheck<span class="brand-accent">Pro</span></h1>
+        <p class="brand-tagline">Smart spelling for smart spreadsheets</p>
+      </div>
+
+      <div class="login-card">
+        <!-- Step 1: Enter email -->
+        <div id="login-step-email">
+          <p class="login-label">Enter your email to get started</p>
+          <div class="input-group">
+            <input
+              type="email"
+              id="input-email"
+              class="text-input"
+              placeholder="you@example.com"
+              autocomplete="email"
+            />
+          </div>
+          <button class="btn btn-primary btn-full" id="btn-send-otp">
+            <span class="btn-text">Send OTP</span>
+            <span class="btn-loading hidden">Sending…</span>
+          </button>
+          <p class="login-hint">We'll send a 6-digit code to your email. No password needed.</p>
+        </div>
+
+        <!-- Step 2: Enter OTP -->
+        <div id="login-step-otp" class="hidden">
+          <p class="login-label">Check your email</p>
+          <p class="otp-sent-to" id="otp-sent-label"></p>
+          <div class="otp-inputs" id="otp-box">
+            <input type="text" maxlength="1" class="otp-digit" data-index="0" />
+            <input type="text" maxlength="1" class="otp-digit" data-index="1" />
+            <input type="text" maxlength="1" class="otp-digit" data-index="2" />
+            <input type="text" maxlength="1" class="otp-digit" data-index="3" />
+            <input type="text" maxlength="1" class="otp-digit" data-index="4" />
+            <input type="text" maxlength="1" class="otp-digit" data-index="5" />
+          </div>
+          <button class="btn btn-primary btn-full" id="btn-verify-otp">
+            <span class="btn-text">Verify & Login</span>
+            <span class="btn-loading hidden">Verifying…</span>
+          </button>
+          <button class="btn btn-ghost btn-full" id="btn-back-email">← Use different email</button>
+        </div>
+
+        <!-- Error message area -->
+        <div id="login-error" class="error-box hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 2: MAIN SPELL CHECK SCREEN
+       Shown after successful login
+  ══════════════════════════════════════════ -->
+  <div id="screen-main" class="screen hidden">
+
+    <!-- Top Header Bar -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="header-logo">✦</span>
+        <span class="header-title">SpellCheck Pro</span>
+      </div>
+      <div class="header-right">
+        <span class="usage-badge" id="usage-badge">
+          <span id="usage-count">0</span>/20 free
+        </span>
+        <button class="icon-btn" id="btn-logout" title="Logout">⏻</button>
+      </div>
+    </header>
+
+    <!-- Subscription Alert (shown when limit hit) -->
+    <div id="subscription-banner" class="hidden">
+      <div class="sub-banner">
+        <div class="sub-banner-text">
+          <strong>Free limit reached!</strong>
+          <p>You've used all 20 free corrections.</p>
+        </div>
+        <button class="btn btn-upgrade" id="btn-go-upgrade">Upgrade — ₹1/day</button>
+      </div>
+    </div>
+
+    <!-- Active Subscription Badge (shown when subscribed) -->
+    <div id="pro-badge" class="hidden">
+      <div class="pro-active-bar">
+        ✓ Pro Active — expires <span id="sub-expiry"></span>
+      </div>
+    </div>
+
+    <!-- Scan Controls -->
+    <div class="scan-controls">
+      <p class="section-label">What to check?</p>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="btn-mode-selection" data-mode="selection">
+          Selected Cells
+        </button>
+        <button class="toggle-btn" id="btn-mode-sheet" data-mode="sheet">
+          Entire Sheet
+        </button>
+      </div>
+      <button class="btn btn-primary btn-full btn-scan" id="btn-start-scan">
+        <span class="scan-icon">⟳</span>
+        <span id="scan-btn-text">Check Spelling</span>
+      </button>
+    </div>
+
+    <!-- Divider -->
+    <div class="section-divider">
+      <span>Results</span>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="results-panel" id="results-panel">
+
+      <!-- Empty state: shown before first scan -->
+      <div class="empty-state" id="state-idle">
+        <div class="empty-icon">📋</div>
+        <p>Click "Check Spelling" to scan your cells</p>
+      </div>
+
+      <!-- Scanning state: shown while API is working -->
+      <div class="scanning-state hidden" id="state-scanning">
+        <div class="scan-animation">
+          <div class="scan-dot"></div>
+          <div class="scan-dot"></div>
+          <div class="scan-dot"></div>
+        </div>
+        <p>Scanning for errors…</p>
+      </div>
+
+      <!-- Success: No errors found -->
+      <div class="success-state hidden" id="state-success">
+        <div class="success-icon">✓</div>
+        <p>No spelling errors found!</p>
+        <small>Your spreadsheet looks great.</small>
+      </div>
+
+      <!-- Error list: shown when mistakes are found -->
+      <div class="errors-found hidden" id="state-errors">
+        <div class="errors-header">
+          <span id="error-count-label">0 issues found</span>
+          <div class="bulk-actions">
+            <button class="btn btn-sm btn-danger" id="btn-correct-all">✓ Correct All</button>
+            <button class="btn btn-sm btn-ghost" id="btn-ignore-all">✗ Ignore All</button>
+          </div>
+        </div>
+
+        <!-- List of spelling errors — filled dynamically by taskpane.js -->
+        <div class="error-list" id="error-list">
+          <!--
+            Each error card is created by JavaScript.
+            Template (for reference):
+            <div class="error-card" data-index="0">
+              <div class="error-cell-ref">A2</div>
+              <div class="error-body">
+                <div class="error-original">Chiken</div>
+                <div class="error-arrow">→</div>
+                <div class="error-suggestion-wrap">
+                  <select class="suggestion-select">
+                    <option>Chicken</option>
+                    <option>Chick</option>
+                  </select>
+                </div>
+              </div>
+              <div class="error-actions">
+                <button class="btn btn-xs btn-correct">Correct</button>
+                <button class="btn btn-xs btn-ignore">Ignore</button>
+              </div>
+            </div>
+          -->
+        </div>
+      </div>
+
+      <!-- Generic error message -->
+      <div class="api-error hidden" id="state-api-error">
+        <div class="error-icon">⚠</div>
+        <p id="api-error-message">Something went wrong. Please try again.</p>
+        <button class="btn btn-sm btn-primary" id="btn-retry">Retry</button>
+      </div>
+
+    </div><!-- /results-panel -->
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span id="user-email-display"></span>
+      <a href="#" id="footer-manage-sub">Manage Subscription</a>
+    </footer>
+
+  </div><!-- /screen-main -->
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 3: UPGRADE / SUBSCRIPTION SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="screen-upgrade" class="screen hidden">
+    <div class="upgrade-container">
+      <button class="back-btn" id="btn-back-main">← Back</button>
+
+      <div class="upgrade-hero">
+        <div class="upgrade-icon">⚡</div>
+        <h2>Unlock Unlimited Corrections</h2>
+        <p>You've used your 20 free corrections. Upgrade to keep going.</p>
+      </div>
+
+      <div class="pricing-card">
+        <div class="price-tag">
+          <span class="price-currency">₹</span>
+          <span class="price-amount">1</span>
+          <span class="price-period">/ day</span>
+        </div>
+        <ul class="feature-list">
+          <li>✓ Unlimited spelling corrections</li>
+          <li>✓ Custom food & menu dictionary</li>
+          <li>✓ Full sheet scanning</li>
+          <li>✓ Correct All in one click</li>
+          <li>✓ Priority support</li>
+        </ul>
+
+        <!-- Duration selector -->
+        <div class="duration-selector">
+          <p class="duration-label">Choose duration:</p>
+          <div class="duration-options">
+            <label class="duration-opt">
+              <input type="radio" name="duration" value="1" checked />
+              <span>1 Day — ₹1</span>
+            </label>
+            <label class="duration-opt">
+              <input type="radio" name="duration" value="7" />
+              <span>7 Days — ₹7</span>
+            </label>
+            <label class="duration-opt">
+              <input type="radio" name="duration" value="30" />
+              <span>30 Days — ₹30</span>
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-upgrade btn-full btn-pay" id="btn-pay-now">
+          <span class="btn-text">Pay via UPI →</span>
+          <span class="btn-loading hidden">Opening payment…</span>
+        </button>
+
+        <p class="upi-note">Powered by Razorpay · Secure UPI Payment</p>
+      </div>
+
+      <!-- Payment verification -->
+      <div id="payment-verify-section" class="hidden">
+        <div class="verify-card">
+          <p class="verify-title">Waiting for payment confirmation…</p>
+          <div class="verify-spinner"></div>
+          <p class="verify-hint">Complete the payment in the UPI app that opened. This will update automatically.</p>
+          <button class="btn btn-ghost btn-sm" id="btn-verify-payment">I've paid — verify now</button>
+        </div>
+      </div>
+
+      <div id="upgrade-error" class="error-box hidden"></div>
+    </div>
+  </div>
+
+  <!-- Load our main JavaScript logic last -->
+  <script src="taskpane.js"></script>
+</body>
+</html>

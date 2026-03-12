@@ -1,0 +1,19 @@
+# Environment files — NEVER commit these to Git!
+.env
+.env.local
+.env.production
+
+# Node.js dependencies folder
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
