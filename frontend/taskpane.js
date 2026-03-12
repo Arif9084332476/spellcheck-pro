@@ -26,7 +26,7 @@
 
 // ── Configuration ────────────────────────────────────────────
 // REPLACE THIS with your actual Render backend URL after deploying
-const BACKEND_URL = "https://YOUR-BACKEND-URL.onrender.com";
+const BACKEND_URL = "https://spellcheck-api-phz7.onrender.com";
 
 // Free corrections limit before paywall
 const FREE_LIMIT = 20;
